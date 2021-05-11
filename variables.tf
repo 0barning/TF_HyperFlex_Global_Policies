@@ -19,3 +19,11 @@ variable "env" {
     type = string
     description = "Environment"
 }
+variable "dns_domain_suffix" {
+    type = string
+    description = "DNS Domain Suffix"
+}
+variable "subnet_str" {
+    type = string
+    description = "Subnet String"
+}

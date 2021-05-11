@@ -3,10 +3,10 @@ data "intersight_organization_organization" "org" {
 }
 
 resource "intersight_hyperflex_vcenter_config_policy" "hyperflex_vcenter_config_policy1" {
-  hostname    = "vcenter.workload.local"
-  username    = "administrator@workload.local"
+  hostname    = "vcenter.${var.dns_domain_suffix}"
+  username    = "administrator@${var.dns_domain_suffix}"
   password    = var.password
-  data_center = "WLT"
+  data_center = var.env
   sso_url     = ""
   organization {
     object_type = "organization.Organization"
@@ -16,18 +16,40 @@ resource "intersight_hyperflex_vcenter_config_policy" "hyperflex_vcenter_config_
   description = "Created by Terraform"
 }
 
-resource "intersight_hyperflex_ucsm_config_policy" "hyperflex_ucsm_config_policy1" {
-  name        = "${var.env}_HyperFlex_UCSM_Configuration_Policy"
-  description = "Created by Terraform"
-  kvm_ip_range {
-    start_addr = "10.9.10.10"
-    end_addr   = "10.9.10.100"
-    gateway    = "10.9.10.1"
-    netmask    = "255.255.255.0"
-  }
-  server_firmware_version = "4.1(2b)"
+resource "intersight_hyperflex_local_credential_policy" "hyperflex_local_credential_policy1" {
+  hxdp_root_pwd               = var.password
+  hypervisor_admin            = "root"
+  hypervisor_admin_pwd        = var.password
+  factory_hypervisor_password = false
   organization {
     object_type = "organization.Organization"
     moid        = data.intersight_organization_organization.org.results[0].moid
   }
+  name = "${var.env}_Hyperflex_local_credential_policy"
+  description = "Created by Terraform"
 }
+
+resource "intersight_hyperflex_sys_config_policy" "hyperflex_sys_config_policy1" {
+  dns_servers     = ["${var.subnet_str}.3"]
+  ntp_servers     = ["${var.subnet_str}.3"]
+  timezone        = "Europe/Amsterdam"
+  dns_domain_name = var.dns_domain_suffix
+  organization {
+    object_type = "organization.Organization"
+    moid        = data.intersight_organization_organization.org.results[0].moid
+  }
+  name = "${var.env}_HyperFlex_System_Config_Policy"
+  description = "Created by Terraform"
+}
+
+resource "intersight_hyperflex_cluster_storage_policy" "hyperflex_cluster_storage_policy1" {
+  disk_partition_cleanup = true
+  vdi_optimization       = true
+  organization {
+    object_type = "organization.Organization"
+    moid        = data.intersight_organization_organization.org.results[0].moid
+  }
+  name = "${var.env}_HyperFlex_Storage_Cluster_Policy"
+  description = "Created by Terraform"
+}
+
