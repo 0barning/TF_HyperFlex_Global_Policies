@@ -53,3 +53,44 @@ resource "intersight_hyperflex_cluster_storage_policy" "hyperflex_cluster_storag
   description = "Created by Terraform"
 }
 
+resource "intersight_hyperflex_cluster_network_policy" "hyperflex_cluster_network_policy1" {
+  mgmt_vlan {
+    name    = "hx-inband-mgmt"
+    vlan_id = 10
+  }
+  jumbo_frame  = true
+  uplink_speed = "default"
+  vm_migration_vlan {
+    name = "HX-Migration"
+    vlan_id = 12
+  }
+
+  vm_network_vlans = [
+    for vlan in var.vlans :
+    {
+        name = vlan.name
+        vlan_id = vlan.vlan_id
+        class_id = "hyperflex.NamedVlan"
+        object_type = "hyperflex.NamedVlan"
+        additional_properties = ""
+    }
+  ]
+
+  mac_prefix_range {
+    end_addr   = "00:25:B5:D5"
+    start_addr = "00:25:B5:D5"
+  }
+  kvm_ip_range {
+    start_addr = "${var.subnet_str}.200"
+    end_addr = "${var.subnet_str}.220"
+    gateway = "${var.subnet_str}.1"
+    netmask = "255.255.255.0"
+  }
+  organization {
+    object_type = "organization.Organization"
+    moid        = data.intersight_organization_organization.org.results[0].moid
+  }
+  name = "${var.env}_HyperFlex_Cluster_Network_Policy"
+  description = "Created by Terraform"
+}
+
