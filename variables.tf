@@ -27,7 +27,7 @@ variable "subnet_str" {
     type = string
     description = "Subnet String"
 }
-variable "vlans" {
-  type        = list(object({ vlan_id = number, name = string}))
+variable "vm_vlans" {
+  type        = list(number)
   description = "The VLANs that will be created"
 }

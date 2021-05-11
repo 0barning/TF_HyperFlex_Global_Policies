@@ -57,7 +57,7 @@ resource "intersight_hyperflex_cluster_network_policy" "hyperflex_cluster_networ
   mgmt_vlan {
     name    = "hx-inband-mgmt"
     vlan_id = 10
-  }
+}
   jumbo_frame  = true
   uplink_speed = "default"
   vm_migration_vlan {
@@ -66,10 +66,10 @@ resource "intersight_hyperflex_cluster_network_policy" "hyperflex_cluster_networ
   }
 
   vm_network_vlans = [
-    for vlan in var.vlans :
+    for vlan in var.vm_vlans :
     {
-        name = vlan.name
-        vlan_id = vlan.vlan_id
+        name = "HX-${var.env}-VM-VLAN-${tostring(vlan)}"
+        vlan_id = vlan
         class_id = "hyperflex.NamedVlan"
         object_type = "hyperflex.NamedVlan"
         additional_properties = ""
