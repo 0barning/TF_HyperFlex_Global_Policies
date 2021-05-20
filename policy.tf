@@ -62,7 +62,7 @@ resource "intersight_hyperflex_cluster_network_policy" "hyperflex_cluster_networ
   uplink_speed = "default"
   vm_migration_vlan {
     name = "HX-Migration"
-    vlan_id = 12
+    vlan_id = 19
   }
 
   vm_network_vlans = [
